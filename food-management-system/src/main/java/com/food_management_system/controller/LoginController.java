@@ -11,12 +11,5 @@ public class LoginController {
 	    public String loginPage() {
 	        return "login";  // login.jsp
 	    }
-	    
-	    @GetMapping("/home")
-	    public String homePage() {
-	        return "login";  // login.jsp
-	    }
 
-
-	
 }
