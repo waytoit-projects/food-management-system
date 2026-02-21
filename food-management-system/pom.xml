@@ -15,12 +15,12 @@
 
     <groupId>com.food_management_system</groupId>
     <artifactId>food-management-system</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>food-management-system</name>
     <description>Food Management System</description>
 
     <!-- IMPORTANT FOR JSP -->
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>17</java.version>
