@@ -1,4 +1,4 @@
-package com.food_management_system.repository.crud;
+package com.food_management_system.repository.query;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

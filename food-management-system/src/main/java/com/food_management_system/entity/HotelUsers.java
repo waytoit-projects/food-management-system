@@ -19,7 +19,7 @@ public class HotelUsers {
     private String phone;
     private String email;
     private String hotelName;
-    private Long hotelId;
+    private String hotelId;
     private String hotelType;
 
     public HotelUsers() {
@@ -73,11 +73,11 @@ public class HotelUsers {
         this.hotelName = hotelName;
     }
 
-    public Long getHotelId() {
+    public String getHotelId() {
         return hotelId;
     }
 
-    public void setHotelId(Long hotelId) {
+    public void setHotelId(String hotelId) {
         this.hotelId = hotelId;
     }
 

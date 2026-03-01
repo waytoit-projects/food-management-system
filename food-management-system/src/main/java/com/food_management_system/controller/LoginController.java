@@ -3,6 +3,8 @@ package com.food_management_system.controller;
 import java.util.Map;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
+
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -88,5 +90,10 @@ public class LoginController {
 		} catch (Exception e) {
 			return Map.of("status", "error", "message", "Error executing generic save: " + e.getMessage());
 		}
+	}
+	@PostMapping("/login")
+	public @ResponseBody String login(@RequestBody String json){
+
+	    return genericService.login(json).toString();
 	}
 }
