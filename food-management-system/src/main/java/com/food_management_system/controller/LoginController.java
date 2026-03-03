@@ -3,6 +3,7 @@ package com.food_management_system.controller;
 import java.util.Map;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-
+import jakarta.servlet.http.Cookie;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.food_management_system.security.JwtUtil;
 import com.food_management_system.service.GenericService;
 
 @Controller
@@ -22,78 +24,43 @@ public class LoginController {
 	private GenericService genericService;
 
 	@Autowired
-	private EntityManager entityManager;
+    private JwtUtil jwtUtil;
+	
+//	@PostMapping("/login")
+//	public @ResponseBody String login(@RequestBody String json){
+//
+//	    return genericService.login(json).toString();
+//	}
+	
+	 @PostMapping("/login")
+	    public @ResponseBody String login(@RequestBody String json,
+	                                      HttpServletResponse response) {
 
-	@GetMapping("/login")
-	public String loginPage() {
-		return "login"; // login.jsp
-	}
+	        // 1️ Call your existing service
+	        JSONObject serviceResponse = genericService.login(json);
 
-	@PostMapping("/generic/save")
-	@ResponseBody
-	public Object save(@RequestBody Map<String, Object> payload) {
-		// 1. Mandatory Validation: Every value must not be empty/null to allow insert
-		for (Map.Entry<String, Object> entry : payload.entrySet()) {
-			if (entry.getValue() == null || entry.getValue().toString().trim().isEmpty()) {
-				return Map.of("status", "error", "message", entry.getKey() + " is mandatory to allow insert the data.");
-			}
-		}
+	        boolean success = serviceResponse.getBoolean("success");
 
-		try {
-			Class<?> targetEntityClass = null;
+	        if (success) {
 
-			// 2. Dynamically resolve Entity via Metamodel attributes comparison
-			for (EntityType<?> entityType : entityManager.getMetamodel().getEntities()) {
-				boolean isMatch = true;
-				boolean hasAtLeastOneKey = false;
+	            // 2️ Extract username again from request JSON
+	            JSONObject request = new JSONObject(json);
+	            String username = request.getString("username");
 
-				for (String key : payload.keySet()) {
-					try {
-						entityType.getAttribute(key);
-						hasAtLeastOneKey = true;
-					} catch (IllegalArgumentException e) {
-						isMatch = false; // The payload key is not an attribute in this Entity
-						break;
-					}
-				}
+	            // 3️ Generate JWT
+	            String token = jwtUtil.generateToken(username);
 
-				if (isMatch && hasAtLeastOneKey) {
-					// 3. Ensure all mandatory entity fields are present (besides auto-generated
-					// IDs)
-					for (var attribute : entityType.getAttributes()) {
-						String attrName = attribute.getName();
-						if (!attrName.equals("id") && !payload.containsKey(attrName)) {
-							// Return exact missing key response
-							return Map.of("status", "error", "message",
-									attrName + " is mandatory to allow insert the data.");
-						}
-					}
+	            // 4️ Create HttpOnly Cookie
+	            Cookie cookie = new Cookie("jwt", token);
+	            cookie.setHttpOnly(true);
+	            cookie.setSecure(false); // TRUE in production (HTTPS)
+	            cookie.setPath("/");
+	            cookie.setMaxAge(60 * 60 * 24); // 1 day
 
-					targetEntityClass = entityType.getJavaType();
-					break; // Entity perfectly matched completely
-				}
-			}
+	            response.addCookie(cookie);
+	        }
 
-			if (targetEntityClass == null) {
-				return Map.of("status", "error", "message",
-						"JSON payload does not match any database Entity structure.");
-			}
-
-			// 4. Convert and Persist dynamically
-			ObjectMapper mapper = new ObjectMapper();
-			Object entityToSave = mapper.convertValue(payload, targetEntityClass);
-
-			Object savedResponse = genericService.save(entityToSave);
-
-			return Map.of("status", "success", "message", "Data saved successfully", "data", savedResponse);
-
-		} catch (Exception e) {
-			return Map.of("status", "error", "message", "Error executing generic save: " + e.getMessage());
-		}
-	}
-	@PostMapping("/login")
-	public @ResponseBody String login(@RequestBody String json){
-
-	    return genericService.login(json).toString();
-	}
+	        // 5️ Return your existing JSON response
+	        return serviceResponse.toString();
+	    }
 }
