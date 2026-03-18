@@ -26,11 +26,6 @@ public class LoginController {
 	@Autowired
     private JwtUtil jwtUtil;
 	
-//	@PostMapping("/login")
-//	public @ResponseBody String login(@RequestBody String json){
-//
-//	    return genericService.login(json).toString();
-//	}
 	
 	 @PostMapping("/login")
 	    public @ResponseBody String login(@RequestBody String json,

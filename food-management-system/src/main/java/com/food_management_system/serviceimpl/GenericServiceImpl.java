@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.food_management_system.repository.nativequery.GenericNativeQueries;
 import com.food_management_system.repository.query.GenericRepository;
 import com.food_management_system.service.GenericService;
-
+import com.food_management_system.entity.MenuItem;
 @Service
 public class GenericServiceImpl implements GenericService {
 
@@ -62,5 +62,54 @@ public class GenericServiceImpl implements GenericService {
         }
 
         return response;
+    }
+    
+    @Transactional
+    @Override
+    public JSONObject saveFoodItem(JSONObject request) {
+    	
+    	  JSONObject response = new JSONObject();
+
+          try {
+
+        	  MenuItem item = new MenuItem();
+
+              item.setItemCode(request.optString("itemCode"));
+              item.setItemName(request.optString("itemName"));
+              item.setMainCategory(request.optString("mainCategory"));
+              item.setSubCategory(request.optString("subCategory"));
+              item.setBrandName(request.optString("brandName"));
+              item.setItemType(request.optString("itemType"));
+              item.setIsVeg(request.optBoolean("isVeg"));
+              item.setSize(request.optString("size"));
+              item.setUnit(request.optString("unit"));
+              item.setCostPrice(request.optDouble("costPrice"));
+              item.setSellingPrice(request.optDouble("sellingPrice"));
+              item.setGstPercentage(request.optDouble("gstPercentage"));
+              item.setGstAmount(request.optDouble("gstAmount"));
+              item.setHsnCode(request.optString("hsnCode"));
+              item.setStockQuantity(request.optInt("stockQuantity"));
+              item.setMinStockAlert(request.optInt("minStockAlert"));
+              item.setPreparationTime(request.optInt("preparationTime"));
+              item.setSpicyLevel(request.optString("spicyLevel"));
+              item.setDescription(request.optString("description"));
+              item.setImageUrl(request.optString("imageUrl"));
+              item.setIsAvailable(request.optBoolean("isAvailable"));
+              item.setIsActive(request.optBoolean("isActive"));
+
+              genericRepository.save(item);
+
+              response.put("success", true);
+              response.put("message", "Food item saved successfully");
+
+          } catch (Exception e) {
+
+              response.put("success", false);
+              response.put("message", e.getMessage());
+              e.printStackTrace();
+          }
+
+          return response;
+    	
     }
 }

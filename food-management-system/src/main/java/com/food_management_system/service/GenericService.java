@@ -6,4 +6,6 @@ public interface GenericService {
     <T> T save(T entity);
     
     JSONObject login(String json);
+    
+    JSONObject saveFoodItem(JSONObject json);
 }
